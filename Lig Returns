@@ -21,3 +21,26 @@ Funprog GetSPRLig(ZNUM)
 		Endif
 	RETVAL+=''
 	End RETVAL
+	
+# This function will return the lines of a specified Sales ORder upon its creation, with pattern matching.
+# In this context, we want to be notified when items with a MOS SKU has been ordered. The expression returned 
+# will give the internal sku, vendor sku, description, quantity ordered and gross line price plus tax.
+
+Funprog GetMOSLig(ZNUM)
+	Value Char ZNUM
+	Local Clbfile RETVAL (6)
+	Retval=''
+		If !Clalev([F:ZSOP]) : Local File SORDERP[ZSOP] : Endif
+		If !Clalev([F:ZSOQ]) : Local File SORDERQ[ZSOQ] : Endif
+		LINK [ZSOP] WITH [ZSOQ]SOQ0=[F:ZSOP]SOHNUM;[F:ZSOP]SOPLIN;[F:ZSOP]SOPSEQ AS [ZSO]
+		Filter [ZSO] Where SOHNUM = ZNUM
+		read [ZSO] first
+		if fstat = 0
+			For [ZSO]
+				if pat([F:ZSO]ITMREF, 'MOS*')<>0
+					RETVAL += num$([F:ZSO]SOPLIN/1000)+'. '-[F:ZSO]ITMREF-mess(1,16807,1)-[F:ZSO]ITMDES-mess(1,16807,1)-num$([F:ZSOQ]QTY)-[F:ZSO]SAU-mess(1,16807,1)-chr$(36)+format$("N3vF<:13.2",[F:ZSO]GROPRI*1.12*[F:ZSOQ]QTY)+chr$(13)+chr$(13)+chr$(13)+chr$(13)+chr$(10)+chr$(10)
+				Endif
+			next
+		Endif
+	RETVAL+=''
+	End RETVAL
