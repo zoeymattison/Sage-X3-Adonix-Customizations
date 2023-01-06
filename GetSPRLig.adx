@@ -1,0 +1,23 @@
+# This function will return the lines of a specified PO upon its creation, with pattern matching.
+# In this context, we want to be notified when items with a BASICS SKU (BAS*) are ordered from the
+# SPR vendor (vendor code V6501). The expression returned will give the internal sku, vendor sku,
+# description, quantity ordered and gross line price plus tax.
+
+Funprog GetSPRLig(ZNUM)
+	Value Char ZNUM
+	Local Clbfile RETVAL (6)
+	Retval=''
+		If !Clalev([F:ZPOP]) : Local File PORDERP[ZPOP] : Endif
+		If !Clalev([F:ZPOQ]) : Local File PORDERQ[ZPOQ] : Endif
+		LINK [ZPOP] WITH [ZPOQ]POQ0=[F:ZPOP]POHNUM;[F:ZPOP]POPLIN;[F:ZPOP]POPSEQ AS [ZPO]
+		Filter [ZPO] Where POHNUM = ZNUM
+		read [ZPO] first
+		if fstat = 0
+			For [ZPO]
+				if pat([F:ZPO]ITMREF, 'BAS*')<>0
+					RETVAL += num$([F:ZPO]POPLIN/1000)+'. '-[F:ZPO]ITMREF-mess(1,16807,1)-[F:ZPOQ]ITMREFBPS-mess(1,16807,1)-[F:ZPO]ITMDES-mess(1,16807,1)-num$([F:ZPOQ]QTYSTU)-[F:ZPOQ]STU-mess(1,16807,1)-chr$(36)+format$("N3vF<:13.2",[F:ZPO]GROPRI*1.12*[F:ZPOQ]QTYSTU)+chr$(13)+chr$(13)+chr$(13)+chr$(13)+chr$(10)+chr$(10)
+				Endif
+			next
+		Endif
+	RETVAL+=''
+	End RETVAL
