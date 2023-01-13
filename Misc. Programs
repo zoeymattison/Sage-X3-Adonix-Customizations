@@ -1,0 +1,9 @@
+# Remove the fuel surcharge if the route is set to PU (pick-up).
+
+Subprog ZREMFSCHG
+    If [M]DRN = 23
+        [M:SOH3]INVDTAAMT(3) = 0
+        Affzo [M:SOH3]INVDTAAMT(3)
+        Call ERREURT("The fuel surcharge has been removed\due to pick-up order.", 0) From GESECRAN
+    Endif
+End

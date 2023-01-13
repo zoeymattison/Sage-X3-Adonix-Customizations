@@ -24,7 +24,7 @@ Funprog GetSPRLig(ZNUM)
 	
 # This function will return the lines of a specified Sales ORder upon its creation, with pattern matching.
 # In this context, we want to be notified when items with a MOS SKU has been ordered. The expression returned 
-# will give the internal sku, vendor sku, description, quantity ordered and gross line price plus tax.
+# will give the internal sku, description, quantity ordered and gross line price plus tax.
 
 Funprog GetMOSLig(ZNUM)
 	Value Char ZNUM
