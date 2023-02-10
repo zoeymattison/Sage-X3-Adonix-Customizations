@@ -44,3 +44,46 @@ Funprog GetMOSLig(ZNUM)
 		Endif
 	RETVAL+=''
 	End RETVAL
+
+# Returns the sales order source in a workflow message.
+
+Funprog GetOrdSrc(ZNUM2)
+	Global Decimal ZNUM2
+	Local Clbfile RETVAL (6)
+	RETVAL=''
+		If ZNUM2 = 1
+			RETVAL+= "Phone"
+		Endif
+		If ZNUM2 = 2
+			RETVAL+= "Email"
+		Endif
+		If ZNUM2 = 3
+			RETVAL+= "Fax"
+		Endif
+		If ZNUM2 = 4
+			RETVAL+= "Picking Error"
+		Endif
+		If ZNUM2 = 5
+			RETVAL+= "Short Ship"
+		Endif
+	RETVAL += ''
+	End RETVAL
+	
+# Returns a detailed list of PO lines in a workflow message.
+	
+Funprog GetPOHLig(ZNUM)
+	Value Char ZNUM
+	Local Clbfile RETVAL (6)
+	Retval=''
+		If !Clalev([F:ZZPOP]) : Local File PORDERP[ZZPOP] : Endif
+		If !Clalev([F:ZZPOQ]) : Local File PORDERQ[ZZPOQ] : Endif
+		LINK [ZZPOP] WITH [ZZPOQ]POQ0=[F:ZZPOP]POHNUM;[F:ZZPOP]POPLIN;[F:ZZPOP]POPSEQ AS [ZPO]
+		Filter [ZPO] Where POHNUM = ZNUM
+		read [ZPO] first
+		if fstat = 0
+			For [ZPO]
+				RETVAL += num$([F:ZPO]POPLIN/1000)+'. '-[F:ZPO]ITMREF-mess(1,16807,1)-[F:ZZPOQ]ITMREFBPS-mess(1,16807,1)-[F:ZPO]ITMDES-mess(1,16807,1)-num$([F:ZZPOQ]QTYSTU)-[F:ZZPOQ]STU-mess(1,16807,1)-chr$(36)+format$("N3vF<:13.2",[F:ZPO]GROPRI)-mess(1,16807,1)-chr$(36)+format$("N3vF<:13.2",[F:ZPO]GROPRI*[F:ZZPOQ]QTYSTU)+chr$(13)+chr$(13)+chr$(13)+chr$(13)+chr$(10)+chr$(10)
+			next
+		Endif
+	RETVAL+=''
+	End RETVAL
