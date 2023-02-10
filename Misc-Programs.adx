@@ -1,4 +1,4 @@
-# Remove the fuel surcharge if the route is set to PU (pick-up).
+# Remove the fuel surcharge if the route is set to PU (pick-up), or if source is set to SS (Short Ship), or PE (Picking Error).
 
 Subprog ZREMFSCHG
 	if [M]SOHTYP = "SON"
